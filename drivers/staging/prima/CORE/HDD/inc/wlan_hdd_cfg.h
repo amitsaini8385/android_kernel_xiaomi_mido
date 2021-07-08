@@ -196,7 +196,7 @@
 #define CFG_ENABLE_SUSPEND_NAME                "gEnableSuspend"
 #define CFG_ENABLE_SUSPEND_MIN                 ( 0 ) //No support for suspend
 #define CFG_ENABLE_SUSPEND_MAX                 ( 3 ) //Map to Deep Sleep
-#define CFG_ENABLE_SUSPEND_DEFAULT             ( 1 ) //Map to Standby
+#define CFG_ENABLE_SUSPEND_DEFAULT             ( 3 ) //Map to Standby
 
 //Driver start/stop command mappings
 #define CFG_ENABLE_ENABLE_DRIVER_STOP_NAME     "gEnableDriverStop"
@@ -242,7 +242,7 @@
 #define CFG_DEFER_SCAN_TIME_INTERVAL            "gDeferScanTimeInterval"
 #define CFG_DEFER_SCAN_TIME_INTERVAL_MIN        ( 0 )
 #define CFG_DEFER_SCAN_TIME_INTERVAL_MAX        ( 65535 )
-#define CFG_DEFER_SCAN_TIME_INTERVAL_DEFAULT    ( 2000  )
+#define CFG_DEFER_SCAN_TIME_INTERVAL_DEFAULT    ( 1400  )
 
 //BMPS = BeaconModePowerSave
 #define CFG_ENABLE_BMPS_NAME                   "gEnableBmps"
@@ -2110,6 +2110,11 @@ static __inline tANI_U32 defHddRateToDefCfgRate( tANI_U32 defRateIndex )
 #define CFG_ENABLE_RX_STBC_MAX                   ( 1 )
 #define CFG_ENABLE_RX_STBC_DEFAULT               ( 1 )
 
+#define CFG_ENABLE_TX_STBC                       "gEnableTXSTBC"
+#define CFG_ENABLE_TX_STBC_MIN                   ( 0 )
+#define CFG_ENABLE_TX_STBC_MAX                   ( 1 )
+#define CFG_ENABLE_TX_STBC_DEFAULT               ( 1 )
+
 /* 
  * Enable/Disable vsta based on MAX Assoc limit 
  * defined in WCNSS_qcom_cfg.ini.
@@ -3228,7 +3233,7 @@ This feature requires the dependent cfg.ini "gRoamPrefer5GHz" set to 1 */
 #define CFG_ENABLE_POWERSAVE_OFFLOAD_NAME       "gEnablePowerSaveOffload"
 #define CFG_ENABLE_POWERSAVE_OFFLOAD_MIN        (1)
 #define CFG_ENABLE_POWERSAVE_OFFLOAD_MAX        (2)
-#define CFG_ENABLE_POWERSAVE_OFFLOAD_DEFAULT    (1)
+#define CFG_ENABLE_POWERSAVE_OFFLOAD_DEFAULT    (2)
 
 /*
  * <ini>
@@ -3695,6 +3700,7 @@ typedef struct
    v_U16_t                     configMccParam;
    v_U32_t                     numBuffAdvert;
    v_BOOL_t                    enableRxSTBC;
+   v_BOOL_t                    enableTxSTBC;
 #ifdef FEATURE_WLAN_TDLS       
    v_BOOL_t                    fEnableTDLSSupport;
    v_BOOL_t                    fEnableTDLSImplicitTrigger;

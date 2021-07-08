@@ -38,7 +38,6 @@
 #define NUM_CHANNELS_STEREO 2
 #define NUM_CHANNELS_THREE 3
 #define NUM_CHANNELS_QUAD 4
-#define CVP_VERSION_1 1
 #define CVP_VERSION_2 2
 #define GAIN_Q14_FORMAT(a) (a << 14)
 
@@ -4346,18 +4345,7 @@ static int voice_send_cvp_mfc_config_cmd(struct voice_data *v)
 
 static int voice_get_avcs_version_per_service(uint32_t service_id)
 {
-#if 1
-	if (service_id == AVCS_SERVICE_ID_ALL) {
-		pr_err("%s: Invalid service id: %d", __func__,
-		       AVCS_SERVICE_ID_ALL);
-		return -EINVAL;
-	}
-	common.is_avcs_version_queried = true;
-	return CVP_VERSION_1;
-#else
 	int ret = 0;
-	size_t ver_size;
-	struct avcs_fwk_ver_info *ver_info = NULL;
 
 	if (service_id == AVCS_SERVICE_ID_ALL) {
 		pr_err("%s: Invalid service id: %d", __func__,
@@ -4365,22 +4353,14 @@ static int voice_get_avcs_version_per_service(uint32_t service_id)
 		return -EINVAL;
 	}
 
-	ver_size = sizeof(struct avcs_get_fwk_version) +
-		   sizeof(struct avs_svc_api_info);
-	ver_info = kzalloc(ver_size, GFP_KERNEL);
-	if (ver_info == NULL)
-		return -ENOMEM;
+	ret = q6core_get_avcs_api_version_per_service(service_id);
 
-	ret = q6core_get_service_version(service_id, ver_info, ver_size);
 	if (ret < 0)
 		goto done;
 
-	ret = ver_info->services[0].api_version;
 	common.is_avcs_version_queried = true;
 done:
-	kfree(ver_info);
 	return ret;
-#endif
 }
 
 static void voice_mic_break_work_fn(struct work_struct *work)
@@ -4420,9 +4400,12 @@ static int voice_setup_vocproc(struct voice_data *v)
 		ret = -EINVAL;
 		goto fail;
 	}
-	pr_debug("%s: CVP Version %d\n", __func__, common.cvp_version);
 
-	ret = voice_send_cvp_media_fmt_info_cmd(v);
+	pr_debug("%s: CVP Version %d\n", __func__, common.cvp_version);
+	if (common.cvp_version < CVP_VERSION_2)
+		ret = voice_send_cvp_device_channels_cmd(v);
+	else
+		ret = voice_send_cvp_media_fmt_info_cmd(v);
 
 	if (ret < 0) {
 		pr_err("%s: Set media format info failed err:%d\n", __func__,
